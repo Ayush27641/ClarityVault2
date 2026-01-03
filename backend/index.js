@@ -14,7 +14,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || [
     'http://localhost:5173',
     'http://localhost:3000', 
-    'https://clarity-vault-f.vercel.app'
+    'https://clarity-vault-f.vercel.app',
+    'https://clarity-vault-a.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -46,7 +47,9 @@ app.get('/', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error occurred:', err);
+  console.error('Error stack:', err.stack);
+  console.error('Error message:', err.message);
   res.status(err.status || 500).json({
     message: err.message || 'Internal Server Error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })

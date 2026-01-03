@@ -14,7 +14,7 @@ router.post('/register', register);
 
 // OPTIONS /login - Handle preflight request
 router.options('/login', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'https://clarity-vault-f.vercel.app');
+  res.header('Access-Control-Allow-Origin', 'https://clarity-vault-a.vercel.app');
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.sendStatus(200);
