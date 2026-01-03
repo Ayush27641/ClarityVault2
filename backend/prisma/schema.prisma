@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Role enum matching Java Role.java
+enum Role {
+  ROLE_USER
+  ROLE_ADMIN
+}
+
+// User model matching UserRegistrationsModel.java
+model User {
+  email     String   @id  // Primary key as email (String in Java)
+  password  String   // Encrypted password
+  fullName  String   // User's full name
+  avatarUrl String?  // Optional avatar URL
+  role      Role     @default(ROLE_USER) // Enum type
+  verified  Boolean  @default(false) // Email verification status
+
+  // Relationships
+  files FileModel[] // One user can have many files
+
+  // Timestamps (auto-managed, not in Java model but good to have)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users") // Maps to "users" table as defined in Java @Entity
+}
+
+// FileModel matching FileModel.java exactly
+model FileModel {
+  id       BigInt @id @default(autoincrement()) // long in Java = BigInt in Prisma
+  username String // Username who uploaded the file
+  fileName String // Original filename
+  fileType String // MIME type
+  data     Bytes  // @Lob byte[] in Java = Bytes in Prisma
+
+  // Relationship to User (optional, can be used for better data integrity)
+  user User? @relation(fields: [username], references: [email])
+
+  // Timestamps (auto-managed)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("file_model") // Maps to default table name from Java entity
+}
