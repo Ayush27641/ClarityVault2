@@ -11,12 +11,28 @@ const PORT = process.env.PORT || 3000;
 // Simple CORS configuration for production
 app.use(helmet()); // Security headers
 app.use(cors({
-  origin: process.env.FRONTEND_URL || [
-    'http://localhost:5173',
-    'http://localhost:3000', 
-    'https://clarity-vault-f.vercel.app',
-    'https://clarity-vault-a.vercel.app'
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://clarity-vault-f.vercel.app',
+      'https://clarity-vault-a.vercel.app'
+    ];
+    
+    // Check if FRONTEND_URL is set and add it
+    if (process.env.FRONTEND_URL) {
+      allowedOrigins.push(process.env.FRONTEND_URL);
+    }
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
@@ -41,7 +57,7 @@ app.get('/', (req, res) => {
     message: 'Backend API is running!',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    allowedOrigins: process.env.NODE_ENV === 'development' ? allowedOrigins : ['CORS configured']
+    corsOrigins: process.env.FRONTEND_URL || ['http://localhost:5173', 'http://localhost:3000', 'https://clarity-vault-f.vercel.app', 'https://clarity-vault-a.vercel.app']
   });
 });
 
